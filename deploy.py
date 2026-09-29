@@ -8,9 +8,16 @@ Auto-Deploy Script for Al-Aaqil Market
     python deploy.py
 """
 import sys
+import os
 import subprocess
 import urllib.request
 import json
+
+# Ensure UTF-8 output on Windows consoles
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 DEPLOY_URL = "https://fadhelalzilh.pythonanywhere.com/api/auto-deploy?token=fadhel_market_auto_deploy_2026"
 
@@ -28,13 +35,13 @@ def main():
     commit_msg = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1].strip() else "Auto deploy update"
 
     print("=" * 60)
-    print("🚀 بدء النشر والتحديث التلقائي الشامل (Local -> GitHub -> PythonAnywhere)")
+    print(">> بدء النشر والتحديث التلقائي الشامل (Local -> GitHub -> PythonAnywhere)")
     print("=" * 60)
 
     # 1. Add modified files
     print("\n[1/4] تجهيز الملفات المعدلة (git add .)...")
     if not run_cmd(["git", "add", "."]):
-        print("❌ فشل في تجهيز الملفات.")
+        print("[-] فشل في تجهيز الملفات.")
         return
 
     # 2. Check if commit is needed
@@ -43,16 +50,16 @@ def main():
     if status.stdout.strip():
         run_cmd(["git", "commit", "-m", commit_msg])
     else:
-        print("  لا توجد تغييرات جديدة للحفظ (Commit). سيتم التحديث مباشرة.")
+        print("  لا توجد تغييرات جديدة للحفظ (Commit). سيتم محاولة تحديث السيرفر مباشرة.")
 
     # 3. Push to GitHub
     print("\n[3/4] رفع التعديلات إلى GitHub (git push origin main)...")
     if not run_cmd(["git", "push", "origin", "main"]):
-        print("❌ فشل الرفع إلى GitHub. تأكد من اتصال الإنترنت.")
+        print("[-] فشل الرفع إلى GitHub. تأكد من اتصال الإنترنت.")
         return
 
     # 4. Trigger auto-deploy on PythonAnywhere
-    print("\n[4/4] إرسال أمر التحديث التلقائي وإعادة التشغيل إلى سيرفر PythonAnywhere...")
+    print("\n[4/4] إرسال أمر التحديث التلقائي إلى سيرفر PythonAnywhere...")
     try:
         req = urllib.request.Request(
             DEPLOY_URL,
@@ -62,21 +69,21 @@ def main():
             res_body = response.read().decode('utf-8')
             res_data = json.loads(res_body)
             if res_data.get('status') == 'success':
-                print("\n🎉 تم التحديث وإعادة تشغيل السيرفر بنجاح تـام!")
+                print("\n[+] تم التحديث وإعادة تشغيل السيرفر بنجاح تام!")
                 print("تفاصيل العملية في السيرفر:")
                 for line in res_data.get('log', []):
                     if line.strip():
-                        print(f"  • {line}")
+                        print(f"  * {line}")
             else:
-                print("\n⚠️ استجابة السيرفر:", res_data)
+                print("\n[!] استجابة السيرفر:", res_data)
     except urllib.error.HTTPError as e:
-        print(f"\n⚠️ استجاب السيرفر برمز ({e.code}): {e.reason}")
-        print("💡 ملاحظة مهمة: في المرة الأولى فقط، قم بعمل git pull في سيرفرك لتثبيت مسار التحديث التلقائي.")
+        print(f"\n[!] استجاب السيرفر برمز ({e.code}): {e.reason}")
+        print("ملاحظة مهمة: في المرة الأولى فقط، قم بسحب التحديث يدوياً على السيرفر لتثبيت مسار التحديث التلقائي.")
     except Exception as e:
-        print(f"\n❌ تعذر الوصول لطلب التحديث: {e}")
+        print(f"\n[-] تعذر الوصول لطلب التحديث: {e}")
 
     print("\n" + "=" * 60)
-    print("🌐 رابط موقعك المباشر: https://fadhelalzilh.pythonanywhere.com")
+    print("رابط موقعك المباشر: https://fadhelalzilh.pythonanywhere.com")
     print("=" * 60)
 
 if __name__ == '__main__':
