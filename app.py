@@ -410,6 +410,63 @@ def serve_sw():
 def serve_assetlinks():
     return send_from_directory(os.path.join(app.root_path, 'static', '.well-known'), 'assetlinks.json', mimetype='application/json')
 
+AUTO_DEPLOY_TOKEN = os.environ.get('AUTO_DEPLOY_TOKEN', 'fadhel_market_auto_deploy_2026')
+
+@app.route('/api/auto-deploy', methods=['GET', 'POST'])
+def auto_deploy():
+    token = request.args.get('token') or (request.json and request.json.get('token'))
+    if token != AUTO_DEPLOY_TOKEN:
+        return jsonify({'status': 'error', 'message': 'Unauthorized token'}), 403
+
+    import subprocess
+    import glob
+    output_log = []
+    try:
+        # 1. Fetch from GitHub
+        r1 = subprocess.run(
+            ['git', 'fetch', 'origin', 'main'],
+            cwd=app.root_path,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        output_log.append(f"git fetch: {r1.stdout.strip()} {r1.stderr.strip()}")
+
+        # 2. Reset hard to origin/main
+        r2 = subprocess.run(
+            ['git', 'reset', '--hard', 'origin/main'],
+            cwd=app.root_path,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        output_log.append(f"git reset: {r2.stdout.strip()} {r2.stderr.strip()}")
+
+        # 3. Reload WSGI server on PythonAnywhere by touching the WSGI file
+        reloaded = False
+        wsgi_files = glob.glob('/var/www/*wsgi.py')
+        for wsgi_path in wsgi_files:
+            try:
+                os.utime(wsgi_path, None)
+                reloaded = True
+                output_log.append(f"Touched WSGI file: {wsgi_path}")
+            except Exception as we:
+                output_log.append(f"Error touching {wsgi_path}: {we}")
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Repository updated and server reloaded successfully!',
+            'reloaded': reloaded,
+            'log': output_log
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'log': output_log
+        }), 500
+
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000)
+
 
