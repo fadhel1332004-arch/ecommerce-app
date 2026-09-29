@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سوبر | العاقل ماركت</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- PWA & Mobile App Settings -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1b5e20">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="العاقل ماركت">
+  <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', filename='assets/favicon.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='assets/apple-touch-icon.png') }}">
+</head>
+<body>
+  <div class="app-viewport">
+    
+    <!-- Top Header Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <button class="btn-icon mobile-only-btn" onclick="openDrawer()" title="القائمة">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        {% if active_page and active_page != 'home' %}
+        <button class="btn-icon" onclick="handleBackClick()" title="رجوع">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        {% endif %}
+        
+        <a href="{{ url_for('home') }}" class="store-badge" style="text-decoration: none;">
+          <i class="fa-solid fa-store"></i>
+          <span>العاقل ماركت</span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="header-desktop-nav">
+        <a href="{{ url_for('home') }}" class="desktop-nav-link {% if active_page == 'home' %}active{% endif %}">
+          <i class="fa-solid fa-house"></i>
+          <span>الرئيسية</span>
+        </a>
+        <a href="{{ url_for('products') }}" class="desktop-nav-link {% if active_page == 'products' %}active{% endif %}">
+          <i class="fa-solid fa-border-all"></i>
+          <span>المنتجات</span>
+        </a>
+        <a href="{{ url_for('offers') }}" class="desktop-nav-link {% if active_page == 'offers' %}active{% endif %}">
+          <i class="fa-solid fa-tag"></i>
+          <span>العروض</span>
+        </a>
+        <a href="{{ url_for('favorites') }}" class="desktop-nav-link {% if active_page == 'favorites' %}active{% endif %}">
+          <i class="fa-regular fa-heart"></i>
+          <span>المفضلة</span>
+        </a>
+        <a href="{{ url_for('orders_view') }}" class="desktop-nav-link {% if active_page == 'orders' %}active{% endif %}">
+          <i class="fa-solid fa-truck-fast"></i>
+          <span>الطلبات</span>
+        </a>
+      </nav>
+
+      <div class="header-right">
+        <div class="customer-support-pill desktop-only">
+          <i class="fa-solid fa-headset"></i>
+          <span>773053886</span>
+        </div>
+        <a href="{{ url_for('cart') }}" class="btn-icon cart-icon-btn" title="السلة">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-badge" id="cart-badge-count">0</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Search Input Bar -->
+    <div class="search-container">
+      <div class="search-input-group">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="ابحث في العاقل ماركت عن منتج أو قسم...">
+      </div>
+    </div>
+
+    <!-- Page Content Container -->
+    <main class="app-content">
+      {% block content %}{% endblock %}
+
+      <!-- Helpful Tip: Invite User to Install App (Optional Step) -->
+      <section class="app-install-tip-card" id="app-install-tip">
+        <div class="tip-card-header">
+          <div class="tip-badge">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>نصيحة تسوق ذكية</span>
+          </div>
+          <span class="tip-optional-tag"><i class="fa-solid fa-circle-check"></i> خطوة اختيارية</span>
+          <button class="tip-close-btn" onclick="dismissAppTip()" title="إغلاق هذه النصيحة" aria-label="إغلاق">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="tip-card-body">
+          <div class="tip-app-preview">
+            <img src="{{ url_for('static', filename='assets/app-icon-192.png') }}" alt="أيقونة تطبيق العاقل ماركت" class="tip-app-icon">
+            <div class="tip-app-meta">
+              <span class="tip-app-title">تطبيق «العاقل ماركت» على هاتفك</span>
+              <div class="tip-app-rating">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <span>4.9 • خفيف وسريع (أقل من 2 ميغابايت)</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="tip-description">
+            للحصول على وصول أسرع للمنتجات وإشعارات فورية بأقوى العروض وتتبع طلباتك بسهولة، ندعوك لتثبيت تطبيق المتجر على هاتفك أو عبر <strong>Google Play</strong>.
+            <br>
+            <span class="tip-note">💡 هذه الخطوة اختيارية ومجانية بالكامل، وبإمكانك دوماً متابعة التسوق بكل سهولة عبر المتصفح.</span>
+          </p>
+
+          <div class="tip-action-buttons">
+            <button class="btn-tip-primary" id="btn-tip-install" onclick="triggerPwaInstall()">
+              <i class="fa-solid fa-download"></i>
+              <span>تثبيت التطبيق الآن</span>
+            </button>
+            <button class="btn-tip-googleplay" onclick="openPlayStoreModal()">
+              <i class="fa-brands fa-google-play"></i>
+              <span>متجر Google Play</span>
+            </button>
+            <button class="btn-tip-secondary" onclick="dismissAppTip()">
+              <span>متابعة التصفح هنا</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Floating App Install Banner (Mobile) -->
+    <div class="install-banner" id="install-banner">
+      <div class="install-info" onclick="openPlayStoreModal()" style="cursor: pointer;">
+        <img src="{{ url_for('static', filename='assets/app-icon-192.png') }}" class="banner-app-icon" alt="icon">
+        <div class="install-text">
+          <h4>تطبيق العاقل ماركت</h4>
+          <p>تصفح أسرع وتجربة أسهل (اختياري)</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <button class="btn-install-now" onclick="triggerPwaInstall()">تثبيت</button>
+        <button class="btn-icon" style="color: white; width: 28px; height: 28px;" onclick="closeInstallBanner()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar (Mobile / Tablet) -->
+    <nav class="bottom-nav">
+      <a href="{{ url_for('home') }}" class="nav-item {% if active_page == 'home' %}active{% endif %}">
+        <i class="fa-solid fa-house"></i>
+        <span>الرئيسية</span>
+      </a>
+      <a href="{{ url_for('products') }}" class="nav-item {% if active_page == 'products' %}active{% endif %}">
+        <i class="fa-solid fa-border-all"></i>
+        <span>المنتجات</span>
+      </a>
+      <a href="{{ url_for('cart') }}" class="nav-item {% if active_page == 'cart' %}active{% endif %}">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>السلة</span>
+      </a>
+      <a href="{{ url_for('offers') }}" class="nav-item {% if active_page == 'offers' %}active{% endif %}">
+        <i class="fa-solid fa-tag"></i>
+        <span>العروض</span>
+      </a>
+    </nav>
+
+    <!-- Side Overlay Navigation Drawer -->
+    <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()">
+      <div class="drawer-panel" onclick="event.stopPropagation()">
+        <div class="drawer-header">
+          <div class="drawer-brand">
+            <i class="fa-solid fa-store" style="color: var(--primary);"></i>
+            <span>العاقل ماركت</span>
+          </div>
+          <button class="btn-icon" style="color: var(--text-grey);" onclick="closeDrawer()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border-color);">
+        <a href="{{ url_for('orders_view') }}" class="drawer-tile">
+          <i class="fa-solid fa-truck-fast" style="color: var(--primary);"></i>
+          <span>الطلبات</span>
+        </a>
+        <a href="{{ url_for('returns') }}" class="drawer-tile">
+          <i class="fa-solid fa-arrow-rotate-left" style="color: var(--accent-red);"></i>
+          <span>المرجوعات</span>
+        </a>
+        <a href="{{ url_for('favorites') }}" class="drawer-tile">
+          <i class="fa-regular fa-heart" style="color: var(--favorite-pink);"></i>
+          <span>المفضلة</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openPlayStoreModal(); closeDrawer();" class="drawer-tile highlight-drawer-tile">
+          <i class="fa-brands fa-google-play" style="color: #01875f;"></i>
+          <span>تطبيق الهاتف (Google Play)</span>
+          <span class="drawer-tag-new">جديد</span>
+        </a>
+        <div class="drawer-footer">
+          <p>خدمة العملاء: 773053886</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Details Modal Dialog -->
+    <div class="modal-backdrop" id="product-modal" onclick="closeProductModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <span class="modal-title" id="modal-title">اسم المنتج</span>
+          <button class="btn-icon" style="width: 28px; height: 28px;" onclick="closeProductModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-img-container">
+          <img src="" id="modal-img" class="modal-img" alt="product">
+          <div id="modal-fallback" class="product-fallback-icon" style="display: none;">
+            <i class="fa-solid fa-box-open"></i>
+            <span>غلاف المنتج</span>
+          </div>
+        </div>
+        <div class="modal-price-row">
+          <span class="modal-price" id="modal-price">0 ر.ي</span>
+          <span class="badge-tag" id="modal-badge">الأكثر طلباً</span>
+        </div>
+        <div class="modal-meta" id="modal-meta">الوحدة: حبة | القسم: ألبان وأجبان</div>
+        <p class="modal-desc" id="modal-desc">وصف المنتج الكامل...</p>
+        
+        <div class="modal-qty-row">
+          <span style="font-size: 0.85rem; font-weight: 700;">حدد الكمية:</span>
+          <div class="qty-counter">
+            <button class="btn-qty" onclick="decModalQty()"><i class="fa-regular fa-square-minus"></i></button>
+            <span class="qty-val" id="modal-qty-val">1</span>
+            <button class="btn-qty" onclick="incModalQty()"><i class="fa-regular fa-square-plus"></i></button>
+          </div>
+        </div>
+        <button class="btn-add-cart" style="height: 40px; font-size: 0.9rem;" onclick="addModalToCart()">
+          <i class="fa-solid fa-cart-plus"></i>
+          <span>إضافة إلى السلة</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Play Store & App Install Modal Dialog -->
+    <div class="modal-backdrop" id="playstore-modal" onclick="closePlayStoreModal()">
+      <div class="modal-content install-modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fa-brands fa-google-play" style="color: #01875f; font-size: 1.25rem;"></i>
+            <span class="modal-title">تطبيق العاقل ماركت للأجهزة الذكية</span>
+          </div>
+          <button class="btn-icon" style="width: 28px; height: 28px;" onclick="closePlayStoreModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="install-modal-body">
+          <div class="modal-app-hero">
+            <img src="{{ url_for('static', filename='assets/app-icon-192.png') }}" class="modal-app-logo" alt="شعار العاقل ماركت">
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-dark);">العاقل ماركت - Al-Aaqil Market</h3>
+              <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-grey);">سوقك الإلكتروني الأول في اليمن • تسوق أسهل وأسرع</p>
+              <div style="display: flex; gap: 6px; align-items: center; margin-top: 6px; font-size: 0.75rem; color: #ff9800;">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                <span style="color: var(--text-grey);">(4.9 تقييم • مجاني بالكامل)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="install-options-container">
+            <!-- Option 1: Native 1-Click PWA Install -->
+            <div class="install-option-card">
+              <div class="option-header">
+                <div class="option-icon-wrap"><i class="fa-solid fa-bolt"></i></div>
+                <div>
+                  <strong>تثبيت سريع ومباشر على الشاشة الرئيسية (PWA)</strong>
+                  <p>تثبيت فوري دون استهلاك ذاكرة الهاتف (حجم أقل من 1 ميغابايت) مع سرعة تصفح فائقة.</p>
+                </div>
+              </div>
+              <button class="btn-install-direct" onclick="triggerPwaInstall()">
+                <i class="fa-solid fa-mobile-screen"></i>
+                <span>تثبيت الآن على هاتفي</span>
+              </button>
+            </div>
+
+            <!-- Option 2: Google Play Store -->
+            <div class="install-option-card">
+              <div class="option-header">
+                <div class="option-icon-wrap" style="background-color: #e8f5e9; color: #01875f;"><i class="fa-brands fa-google-play"></i></div>
+                <div>
+                  <strong>متوفر على متجر Google Play (TWA App)</strong>
+                  <p>حزمة أندرويد رسمية جاهزة للتحميل عبر متجر تطبيقات جوجل مع تحديثات تلقائية.</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                <a href="https://play.google.com/store/apps/details?id=com.alaaqilmarket.app" target="_blank" rel="noopener" class="playstore-badge-btn">
+                  <i class="fa-brands fa-google-play"></i>
+                  <div class="badge-text">
+                    <span class="badge-sub">GET IT ON</span>
+                    <span class="badge-main">Google Play</span>
+                  </div>
+                </a>
+                <button class="btn-how-to-guide" onclick="toggleInstallSteps()">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span>شرح خطوات التثبيت</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Manual Steps Collapse -->
+            <div class="install-steps-guide" id="install-steps-guide" style="display: none;">
+              <h5 style="margin: 0 0 8px 0; font-size: 0.85rem; color: var(--primary);">📱 خطوات التثبيت اليدوي السريعة:</h5>
+              <div class="step-row">
+                <span class="step-num">1</span>
+                <span><strong>لهواتف أندرويد (Google Chrome):</strong> اضغط على قائمة الخيارات (⋮) أعلى المتصفح، ثم اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</span>
+              </div>
+              <div class="step-row">
+                <span class="step-num">2</span>
+                <span><strong>لهواتف آيفون (Safari):</strong> اضغط على زر المشاركة (Share ⎋) أسفل الشاشة، ثم مرر للأسفل واختر «إضافة إلى الشاشة الرئيسية Add to Home Screen».</span>
+              </div>
+            </div>
+
+            <div class="install-disclaimer">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span><strong>تذكير مهم:</strong> تثبيت التطبيق هو خطوة اختيارية تماماً، فالموقع يعمل بكامل وظائفه وأمانه مباشرة عبر أي متصفح!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

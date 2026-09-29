@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.alaaqilmarket.app",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:CD:07:4B:43:A1:84:35:F6:5E:2E:FE:66:06:81:42:C8:4E:57:F9:61:44:F3:35:84:16:E6:B3:6D:2A"
+      ]
+    }
+  }
+]

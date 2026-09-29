@@ -1,0 +1,53 @@
+{
+  "packageId": "com.alaaqilmarket.app",
+  "host": "alaaqil-market.com",
+  "name": "العاقل ماركت - Al-Aaqil Market",
+  "launcherName": "العاقل ماركت",
+  "display": "standalone",
+  "themeColor": "#1B5E20",
+  "themeColorDark": "#0E3813",
+  "navigationColor": "#0E3813",
+  "navigationColorDark": "#0E3813",
+  "navigationDividerColor": "#1B5E20",
+  "navigationDividerColorDark": "#1B5E20",
+  "backgroundColor": "#0E3813",
+  "enableNotifications": true,
+  "startUrl": "/?source=playstore",
+  "iconUrl": "https://alaaqil-market.com/static/assets/app-icon-512.png",
+  "maskableIconUrl": "https://alaaqil-market.com/static/assets/app-icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "alaaqil_market"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [
+    {
+      "name": "العروض",
+      "shortName": "العروض",
+      "url": "https://alaaqil-market.com/offers",
+      "chosenIconUrl": "https://alaaqil-market.com/static/assets/app-icon-192.png"
+    },
+    {
+      "name": "السلة",
+      "shortName": "السلة",
+      "url": "https://alaaqil-market.com/cart",
+      "chosenIconUrl": "https://alaaqil-market.com/static/assets/app-icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://alaaqil-market.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  }
+}

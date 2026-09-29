@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Hero Banner Carousel -->
+<div class="carousel-card">
+  {% for item in carousel %}
+  <div class="carousel-slide {% if loop.first %}active{% endif %}">
+    {% if item.img %}
+    <img src="{{ url_for('static', filename='assets/' + item.img) }}" class="carousel-img" alt="{{ item.name }}">
+    {% else %}
+    <div class="carousel-fallback-icon">
+      <i class="fa-solid {{ item.icon }}"></i>
+    </div>
+    {% endif %}
+    <div class="carousel-overlay">
+      <div class="carousel-info">
+        <span class="carousel-badge" style="background-color: {{ item.badge_color }};">{{ item.badge }}</span>
+        <h3 class="carousel-title">{{ item.name }}</h3>
+        <span class="carousel-price">{{ item.price }} ر.ي ({{ item.unit }})</span>
+      </div>
+      <button class="btn-add-yellow" onclick='addToCart({{ item | tojson }})'>
+        <i class="fa-solid fa-cart-plus"></i>
+        <span>أضف للسلة</span>
+      </button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Carousel Progress Dots -->
+<div class="carousel-dots">
+  {% for item in carousel %}
+  <span class="dot {% if loop.first %}active{% endif %}"></span>
+  {% endfor %}
+</div>
+
+<!-- Browse Categories Section -->
+<div class="section-header">
+  <span class="section-title">تصفح الأقسام</span>
+  <a href="{{ url_for('products') }}" class="link-btn">عرض الكل</a>
+</div>
+
+<div class="category-scroll-row">
+  <a href="{{ url_for('products', cat='ألبان وأجبان') }}" class="category-circle-item" style="text-decoration: none;">
+    <div class="category-circle-icon"><i class="fa-solid fa-glass-water"></i></div>
+    <span class="category-circle-label">ألبان وأجبان</span>
+  </a>
+  <a href="{{ url_for('products', cat='تموينات أساسية') }}" class="category-circle-item" style="text-decoration: none;">
+    <div class="category-circle-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+    <span class="category-circle-label">تموينات أساسية</span>
+  </a>
+  <a href="{{ url_for('products', cat='مشروبات وعصائر') }}" class="category-circle-item" style="text-decoration: none;">
+    <div class="category-circle-icon"><i class="fa-solid fa-wine-bottle"></i></div>
+    <span class="category-circle-label">مشروبات وعصائر</span>
+  </a>
+  <a href="{{ url_for('products', cat='معلبات وأغذية') }}" class="category-circle-item" style="text-decoration: none;">
+    <div class="category-circle-icon"><i class="fa-solid fa-box-archive"></i></div>
+    <span class="category-circle-label">معلبات وأغذية</span>
+  </a>
+  <a href="{{ url_for('products', cat='حلويات وبسكويت') }}" class="category-circle-item" style="text-decoration: none;">
+    <div class="category-circle-icon"><i class="fa-solid fa-cookie-bite"></i></div>
+    <span class="category-circle-label">حلويات وبسكويت</span>
+  </a>
+  <a href="{{ url_for('products', cat='منظفات وعناية') }}" class="category-circle-item" style="text-decoration: none;">
+    <div class="category-circle-icon"><i class="fa-solid fa-soap"></i></div>
+    <span class="category-circle-label">منظفات وعناية</span>
+  </a>
+</div>
+
+<!-- Featured Products Section -->
+<div class="section-header">
+  <span class="section-title">منتجات مختارة في العاقل ماركت</span>
+</div>
+
+<div class="products-grid">
+  {% for p in featured %}
+  <div class="product-card" data-name="{{ p.name }}" data-cat="{{ p.cat }}">
+    <div class="card-top-bar">
+      <button class="fav-btn" onclick='toggleFav({{ p | tojson }}, this)'>
+        <i class="fa-regular fa-heart"></i>
+      </button>
+      <span class="badge-tag" style="background-color: {{ p.badge_color }};">{{ p.badge }}</span>
+    </div>
+
+    <div class="product-img-wrapper" onclick="openProductDetails({{ p.id }})">
+      {% if p.img %}
+      <img src="{{ url_for('static', filename='assets/' + p.img) }}" class="product-img" alt="{{ p.name }}">
+      {% else %}
+      <div class="product-fallback-icon">
+        <i class="fa-solid {{ p.icon }}"></i>
+        <span>غلاف المنتج</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="product-title" onclick="openProductDetails({{ p.id }})">{{ p.name }}</div>
+    <div class="product-unit">الوحدة: {{ p.unit }}</div>
+
+    <div class="product-pricing">
+      <span class="price-current">{{ p.price }} ر.ي</span>
+      {% if p.old_price %}
+      <span class="price-old">{{ p.old_price }} ر.ي</span>
+      {% endif %}
+    </div>
+
+    <button class="btn-add-cart" onclick='addToCart({{ p | tojson }})'>
+      <i class="fa-solid fa-cart-plus"></i>
+      <span>إضافة للسلة</span>
+    </button>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

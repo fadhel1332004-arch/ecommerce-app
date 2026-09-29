@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="section-header">
+  <span class="section-title" id="cart-title">سلة التسوق</span>
+  <button class="btn-icon" onclick="handleBackClick()" title="رجوع"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- Responsive Cart Layout Wrapper -->
+<div class="cart-layout" id="cart-layout-wrapper">
+  <div id="cart-items-container" class="cart-items-section">
+    <!-- Dynamic Cart Items Rendered via JavaScript -->
+  </div>
+
+  <div class="card-container cart-summary-section" id="cart-summary-box" style="display: none;">
+    <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 12px; color: var(--primary);">ملخص الفاتورة</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+      <span style="font-size: 0.95rem; font-weight: 700;">إجمالي الفاتورة:</span>
+      <span style="font-size: 1.2rem; font-weight: 800; color: var(--primary);" id="cart-grand-total">0 ر.ي</span>
+    </div>
+    <a href="{{ url_for('checkout') }}" class="btn-add-cart" style="height: 44px; font-size: 0.95rem; text-decoration: none;">
+      <span>متابعة إتمام الطلب</span>
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function renderCartView() {
+  const container = document.getElementById('cart-items-container');
+  const summaryBox = document.getElementById('cart-summary-box');
+  const titleEl = document.getElementById('cart-title');
+
+  const items = Object.values(cart);
+  const totalItemsCount = items.reduce((sum, item) => sum + item.qty, 0);
+
+  if (titleEl) {
+    titleEl.textContent = `سلة التسوق (${totalItemsCount} منتج)`;
+  }
+
+  if (items.length === 0) {
+    summaryBox.style.display = 'none';
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fa-solid fa-cart-arrow-down"></i>
+        <h3>سلة مشترياتك فارغة حالياً</h3>
+        <a href="{{ url_for('products') }}" class="btn-add-cart" style="width: auto; padding: 10px 20px; text-decoration: none;">
+          تصفح المنتجات في المتجر
+        </a>
+      </div>
+    `;
+    return;
+  }
+
+  let totalAmount = 0;
+  let html = '';
+
+  items.forEach(item => {
+    const p = item.product;
+    const q = item.qty;
+    const subtotal = p.price * q;
+    totalAmount += subtotal;
+
+    const imgHtml = p.img ? `<img src="/static/assets/${p.img}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" alt="${p.name}">` : `<i class="fa-solid ${p.icon}" style="font-size: 1.8rem; color: var(--primary);"></i>`;
+
+    html += `
+      <div class="card-container" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 10px;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          ${imgHtml}
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700;">${p.name}</div>
+            <div style="font-size: 0.78rem; color: var(--primary); font-weight: 700; margin-top: 2px;">${p.price} ر.ي × ${q} = ${subtotal} ر.ي</div>
+          </div>
+        </div>
+        <div class="qty-counter">
+          <button class="btn-qty" onclick="changeQty(${p.id}, -1)"><i class="fa-regular fa-square-minus"></i></button>
+          <span class="qty-val">${q}</span>
+          <button class="btn-qty" onclick="changeQty(${p.id}, 1)"><i class="fa-regular fa-square-plus"></i></button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  document.getElementById('cart-grand-total').textContent = `${totalAmount} ر.ي`;
+  summaryBox.style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderCartView();
+});
+</script>
+{% endblock %}

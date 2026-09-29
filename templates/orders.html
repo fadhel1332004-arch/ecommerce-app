@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="section-header">
+  <span class="section-title">سجل الطلبات المؤكدة</span>
+  <button class="btn-icon" onclick="handleBackClick()" title="رجوع"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+{% if not orders %}
+<div class="empty-state">
+  <i class="fa-solid fa-truck-ramp-box"></i>
+  <h3>لا توجد طلبات سابقة حالياً</h3>
+  <a href="{{ url_for('home') }}" class="btn-add-cart" style="width: auto; padding: 10px 20px; text-decoration: none;">
+    ابدأ التسوق الآن
+  </a>
+</div>
+{% else %}
+<div style="display: flex; flex-direction: column; gap: 10px;">
+  {% for ord in orders %}
+  <div class="card-container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <i class="fa-solid fa-circle-check" style="color: var(--success-green); font-size: 1.25rem;"></i>
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 800;">طلب رقم {{ ord.id }}</div>
+          <div style="font-size: 0.72rem; color: var(--text-grey);">المستلم: {{ ord.name }} - {{ ord.phone }}</div>
+        </div>
+      </div>
+      <span style="font-size: 0.85rem; font-weight: 800; color: var(--primary);">{{ ord.total }} ر.ي</span>
+    </div>
+    <div style="font-size: 0.75rem; color: #616161; margin-bottom: 4px;">العنوان: {{ ord.address }}</div>
+    <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary);">طريقة الدفع: {{ ord.payment }}</div>
+    {% if ord.tx_ref and ord.payment_code != 'cod' %}
+    <div style="font-size: 0.7rem; color: var(--text-grey);">رقم الحوالة/العملية: {{ ord.tx_ref }}</div>
+    {% endif %}
+    {% if ord.receipt_file %}
+    <div style="font-size: 0.7rem; color: var(--success-green); font-weight: 700;">ملف الإشعار: {{ ord.receipt_file }}</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

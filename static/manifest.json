@@ -1,0 +1,71 @@
+{
+  "name": "العاقل ماركت - Al-Aaqil Market",
+  "short_name": "العاقل ماركت",
+  "description": "تطبيق متجر العاقل ماركت للمواد الغذائية والتموينات السريعة في اليمن - تسوق أسهل وعروض حصرية",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0e3813",
+  "theme_color": "#1b5e20",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["shopping", "food", "lifestyle"],
+  "icons": [
+    {
+      "src": "/static/assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/assets/app-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/assets/app-icon.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "العروض والتخفيضات",
+      "short_name": "العروض",
+      "description": "تصفح أحدث عروض العاقل ماركت",
+      "url": "/offers?source=shortcut",
+      "icons": [{ "src": "/static/assets/app-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "سلة المشتريات",
+      "short_name": "السلة",
+      "description": "عرض سلة مشترياتك وإتمام الطلب",
+      "url": "/cart?source=shortcut",
+      "icons": [{ "src": "/static/assets/app-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "طلباتي",
+      "short_name": "الطلبات",
+      "description": "متابعة حالة طلباتك السابقة",
+      "url": "/orders?source=shortcut",
+      "icons": [{ "src": "/static/assets/app-icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.alaaqilmarket.app",
+      "id": "com.alaaqilmarket.app"
+    }
+  ],
+  "prefer_related_applications": false
+}

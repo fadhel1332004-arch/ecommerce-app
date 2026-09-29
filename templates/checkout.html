@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div id="checkout-form-container">
+  <div class="section-header">
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <i class="fa-solid fa-credit-card" style="color: var(--primary);"></i>
+      <span class="section-title">إنهاء الطلب والدفع الإلكتروني</span>
+    </div>
+    <button class="btn-icon" onclick="handleBackClick()" title="رجوع للسلة"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)">
+    <div class="checkout-layout">
+      <!-- Left Column: Form Details & Payment Method -->
+      <div class="checkout-main-section">
+        <div class="card-container">
+          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; color: var(--primary);">بيانات العميل والتوصيل</h3>
+          
+          <div class="form-group">
+            <label class="form-label">اسم العميل (ثلاثي أو ثنائي)</label>
+            <input type="text" id="cust-name" class="form-control" placeholder="أدخل اسمك كاملاً" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">رقم الهاتف اليمني (مثال: 773053886)</label>
+            <input type="tel" id="cust-phone" class="form-control" placeholder="77XXXXXXX" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">عنوان التوصيل (المدينة / الحي / الشارع)</label>
+            <input type="text" id="cust-address" class="form-control" placeholder="العنوان التفصيلي" required>
+          </div>
+        </div>
+
+        <div class="card-container">
+          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; color: var(--primary);">طريقة الدفع المناسبة</h3>
+          
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="payment_choice" value="cod" checked onchange="toggleWalletUI()">
+              <span>الدفع عند الاستلام (نقدًا)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="payment_choice" value="onecash" onchange="toggleWalletUI()">
+              <span>محفظة ون كاش (OneCash)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="payment_choice" value="jeeb" onchange="toggleWalletUI()">
+              <span>محفظة جيب (Jeeb)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="payment_choice" value="floosak" onchange="toggleWalletUI()">
+              <span>محفظة فلوسك (Floosak)</span>
+            </label>
+          </div>
+
+          <!-- Digital Wallet Details Box -->
+          <div class="wallet-info-box" id="wallet-info-box" style="display: none;">
+            <div class="wallet-info-title">
+              <i class="fa-solid fa-wallet"></i>
+              <span id="wallet-title-name">بيانات التحويل عبر المحفظة:</span>
+            </div>
+            <div class="wallet-detail">رقم الحساب / الجوال: 773053886</div>
+            <div class="wallet-detail">اسم المستلم: فاضل الزيلة</div>
+            <button type="button" class="btn-copy" onclick="copyAccountNumber()">
+              <i class="fa-regular fa-copy"></i>
+              <span>نسخ رقم الحساب 773053886</span>
+            </button>
+            <hr style="border: none; border-top: 1px solid #c8e6c9; margin: 8px 0;">
+            <div class="wallet-detail">إرفاق صورة إشعار السداد:</div>
+            <input type="file" id="receipt-file" class="form-control" accept="image/*" style="margin-top: 4px;">
+          </div>
+
+          <div class="form-group" id="tx-ref-group" style="display: none; margin-top: 10px;">
+            <label class="form-label">رقم العملية / الحوالة من المحفظة</label>
+            <input type="text" id="tx-ref" class="form-control" placeholder="أدخل رقم الإشعار أو الحوالة">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Invoice Summary & Action -->
+      <div class="checkout-summary-section">
+        <div class="card-container" style="position: sticky; top: 90px;">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 12px; color: var(--primary);">ملخص الطلب</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+            <span style="font-weight: 700; font-size: 0.95rem;">المبلغ الإجمالي:</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: var(--primary);" id="checkout-total-val">0 ر.ي</span>
+          </div>
+
+          <button type="submit" class="btn-add-cart" style="height: 44px; font-size: 0.95rem;">
+            <i class="fa-solid fa-check"></i>
+            <span>تأكيد وإرسال الفاتورة عبر واتساب</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Order Confirmation Success View -->
+<div id="order-success-container" style="display: none;">
+  <div class="empty-state">
+    <i class="fa-solid fa-circle-check" style="color: var(--success-green); font-size: 4.5rem;"></i>
+    <h2 style="color: var(--success-green); font-size: 1.25rem; font-weight: 800;">تم تأكيد الطلب بنجاح!</h2>
+    <div style="font-size: 1rem; font-weight: 800; color: var(--primary);" id="success-order-id">رقم الطلب: ORD-001</div>
+    <div style="font-size: 0.85rem; font-weight: 700;" id="success-pay-method">طريقة الدفع: </div>
+    <div style="font-size: 0.8rem; color: var(--text-grey);" id="success-address">العنوان: </div>
+    <div style="font-size: 0.95rem; font-weight: 800;" id="success-total">المبلغ الإجمالي: 0 ر.ي</div>
+
+    <button class="btn-add-cart" id="reopen-wa-btn" style="background-color: var(--success-green); margin-top: 10px;">
+      <i class="fa-brands fa-whatsapp"></i>
+      <span>فتح المحادثة في واتساب مجدداً</span>
+    </button>
+
+    <a href="{{ url_for('orders_view') }}" class="btn-add-cart" style="background-color: transparent; color: var(--primary); border: 1px solid var(--primary); text-decoration: none;">
+      <i class="fa-solid fa-truck-fast"></i>
+      <span>عرض تفاصيل الطلب في سجل الطلبات</span>
+    </a>
+
+    <a href="{{ url_for('home') }}" class="link-btn" style="font-size: 0.85rem; margin-top: 6px;">
+      العودة للرئيسية
+    </a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let checkoutTotal = 0;
+
+function toggleWalletUI() {
+  const selectedPay = document.querySelector('input[name="payment_choice"]:checked').value;
+  const walletBox = document.getElementById('wallet-info-box');
+  const txRefGroup = document.getElementById('tx-ref-group');
+  const titleName = document.getElementById('wallet-title-name');
+
+  const walletNames = {
+    'onecash': 'ون كاش (OneCash)',
+    'jeeb': 'جيب (Jeeb)',
+    'floosak': 'فلوسك (Floosak)'
+  };
+
+  if (selectedPay in walletNames) {
+    walletBox.style.display = 'flex';
+    txRefGroup.style.display = 'block';
+    titleName.textContent = `بيانات التحويل عبر ${walletNames[selectedPay]}:`;
+  } else {
+    walletBox.style.display = 'none';
+    txRefGroup.style.display = 'none';
+  }
+}
+
+function validateYemeniName(name) {
+  const cleaned = name.trim();
+  if (cleaned.length < 3) return false;
+  return /^[\u0621-\u064A\u0660-\u0669a-zA-Z\s]+$/.test(cleaned);
+}
+
+function validateYemeniPhone(phone) {
+  const cleaned = phone.trim().replace(/\s+/g, '').replace(/-/g, '');
+  return /^(?:(?:\+|00)967)?(7[01378]\d{7})$/.test(cleaned);
+}
+
+function handleCheckoutSubmit(e) {
+  e.preventDefault();
+
+  const name = document.getElementById('cust-name').value;
+  const phone = document.getElementById('cust-phone').value;
+  const address = document.getElementById('cust-address').value;
+  const paymentCode = document.querySelector('input[name="payment_choice"]:checked').value;
+  const txRef = document.getElementById('tx-ref').value;
+  const receiptFile = document.getElementById('receipt-file').files[0];
+
+  if (!validateYemeniName(name)) {
+    showToast('يرجى إدخال اسم عميل صحيح (3 أحرف على الأقل وبدون رموز أو أرقام)!');
+    return;
+  }
+
+  if (!validateYemeniPhone(phone)) {
+    showToast('رقم الهاتف غير صالح! يجب أن يكون رقم جوال يمني مكون من 9 أرقام يبدأ بـ (77 أو 78 أو 73 أو 71 أو 70).');
+    return;
+  }
+
+  if (!address || address.trim().length < 4) {
+    showToast('يرجى إدخال عنوان توصيل تفصيلي وواضح!');
+    return;
+  }
+
+  const isWallet = ['onecash', 'jeeb', 'floosak'].includes(paymentCode);
+  if (isWallet && !receiptFile && (!txRef || !txRef.trim())) {
+    showToast('يرجى رفع صورة إشعار السداد أو كتابة رقم العملية للمتابعة!');
+    return;
+  }
+
+  const items = Object.values(cart);
+  const itemsText = items.map(it => `- ${it.product.name} (${it.qty} ${it.product.unit})`).join('\n');
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('phone', phone);
+  formData.append('address', address);
+  formData.append('payment_code', paymentCode);
+  formData.append('tx_ref', txRef);
+  formData.append('items', itemsText);
+  formData.append('total', checkoutTotal);
+  if (receiptFile) {
+    formData.append('receipt', receiptFile);
+  }
+
+  fetch('/api/checkout', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      // Clear cart
+      cart = {};
+      saveState();
+
+      // Open WhatsApp
+      if (data.wa_url) {
+        window.open(data.wa_url, '_blank');
+      }
+
+      // Show confirmation
+      document.getElementById('checkout-form-container').style.display = 'none';
+      const succ = document.getElementById('order-success-container');
+      succ.style.display = 'block';
+
+      document.getElementById('success-order-id').textContent = `رقم الطلب: ${data.order.id}`;
+      document.getElementById('success-pay-method').textContent = `طريقة الدفع: ${data.order.payment}`;
+      document.getElementById('success-address').textContent = `العنوان: ${data.order.address}`;
+      document.getElementById('success-total').textContent = `المبلغ الإجمالي: ${data.order.total} ر.ي`;
+
+      document.getElementById('reopen-wa-btn').onclick = () => {
+        window.open(data.wa_url, '_blank');
+      };
+    } else {
+      showToast(data.message || 'حدث خطأ أثناء تنفيذ الطلب');
+    }
+  })
+  .catch(err => {
+    showToast('حدث خطأ في الاتصال بالخادم');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const items = Object.values(cart);
+  if (items.length === 0) {
+    window.location.href = '/cart';
+    return;
+  }
+
+  checkoutTotal = items.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+  document.getElementById('checkout-total-val').textContent = `${checkoutTotal} ر.ي`;
+});
+</script>
+{% endblock %}

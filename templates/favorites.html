@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="section-header">
+  <span class="section-title" id="fav-title-text" style="color: var(--favorite-pink);">المنتجات المفضلة لديك</span>
+  <button class="btn-icon" onclick="handleBackClick()" title="رجوع"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div id="fav-container">
+  <!-- Dynamic Favorites Rendered via JS -->
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function renderFavoritesPage() {
+  const container = document.getElementById('fav-container');
+  const favArray = Array.from(favorites);
+
+  if (favArray.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fa-regular fa-heart" style="color: var(--favorite-pink);"></i>
+        <h3>قائمة المفضلة فارغة حالياً</h3>
+        <p style="font-size: 0.75rem; color: var(--text-grey);">اضغط على علامة القلب على أي منتج لحفظه هنا.</p>
+        <a href="{{ url_for('products') }}" class="btn-add-cart" style="width: auto; padding: 10px 20px; text-decoration: none;">
+          تصفح المنتجات
+        </a>
+      </div>
+    `;
+    return;
+  }
+
+  fetch('/api/products')
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        const favProducts = data.products.filter(p => favorites.has(p.id));
+        document.getElementById('fav-title-text').textContent = `المنتجات المفضلة لديك (${favProducts.length})`;
+
+        let gridHtml = '<div class="products-grid">';
+        favProducts.forEach(p => {
+          const imgHtml = p.img ? `<img src="/static/assets/${p.img}" class="product-img" alt="${p.name}">` : `<div class="product-fallback-icon"><i class="fa-solid ${p.icon}"></i><span>غلاف المنتج</span></div>`;
+          const oldPriceHtml = p.old_price ? `<span class="price-old">${p.old_price} ر.ي</span>` : '';
+
+          gridHtml += `
+            <div class="product-card">
+              <div class="card-top-bar">
+                <button class="fav-btn active" onclick='toggleFav(${JSON.stringify(p)}, this)'>
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+                <span class="badge-tag" style="background-color: ${p.badge_color};">${p.badge}</span>
+              </div>
+
+              <div class="product-img-wrapper" onclick="openProductDetails(${p.id})">
+                ${imgHtml}
+              </div>
+
+              <div class="product-title" onclick="openProductDetails(${p.id})">${p.name}</div>
+              <div class="product-unit">الوحدة: ${p.unit}</div>
+
+              <div class="product-pricing">
+                <span class="price-current">${p.price} ر.ي</span>
+                ${oldPriceHtml}
+              </div>
+
+              <button class="btn-add-cart" onclick='addToCart(${JSON.stringify(p)})'>
+                <i class="fa-solid fa-cart-plus"></i>
+                <span>إضافة للسلة</span>
+              </button>
+            </div>
+          `;
+        });
+        gridHtml += '</div>';
+        container.innerHTML = gridHtml;
+      }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderFavoritesPage();
+});
+</script>
+{% endblock %}
